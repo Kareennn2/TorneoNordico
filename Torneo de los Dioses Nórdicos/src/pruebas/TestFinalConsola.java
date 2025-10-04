@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class TestFinalConsola {
     
-    // Clase interna - TODO en un solo archivo
+    // Clase interna 
     static class JuegoPrueba {
         private int puntos = 100;
         private int victorias = 0;
@@ -12,34 +12,33 @@ public class TestFinalConsola {
         private Random random = new Random();
         
         public String enfrentar(String arma, String escenario, String criatura) {
-            // Solo cálculos, NO interfaces gráficas
             double prob = calcularProbabilidad(arma, escenario, criatura);
             boolean gano = random.nextDouble() < prob;
             
             if (gano) {
                 victorias++;
-                puntos += 30; // 30 puntos por victoria (antes 50)
+                puntos += 30; 
                 return "✅ VICTORIA con " + arma + " vs " + criatura + " en " + escenario + " | +30 puntos";
             } else {
                 derrotas++;
-                puntos = Math.max(0, puntos - 40); // 40 puntos por derrota (antes 25)
+                puntos = Math.max(0, puntos - 40); 
                 return "❌ DERROTA con " + arma + " vs " + criatura + " en " + escenario + " | -40 puntos";
             }
         }
         
         private double calcularProbabilidad(String arma, String escenario, String criatura) {
-            double prob = 0.3; // 30% base (antes 50%)
+            double prob = 0.3; 
             
-            // Mejores combinaciones - PROBABILIDADES MÁS BAJAS
-            if (arma.equals("Espada") && criatura.equals("Dragon")) prob = 0.5; // 50% (antes 80%)
-            if (arma.equals("Hacha") && criatura.equals("Gigante")) prob = 0.4; // 40% (antes 70%)
-            if (arma.equals("Arco") && criatura.equals("Serpiente")) prob = 0.45; // 45% (antes 60%)
+            // Mejores combinaciones 
+            if (arma.equals("Espada") && criatura.equals("Dragon")) prob = 0.5; 
+            if (arma.equals("Hacha") && criatura.equals("Gigante")) prob = 0.4; 
+            if (arma.equals("Arco") && criatura.equals("Serpiente")) prob = 0.45; 
             
-            // Escenarios - BONUS MÁS PEQUEÑOS
-            if (escenario.equals("Asgard")) prob += 0.1; // +10% (antes +20%)
-            if (escenario.equals("Niflheim")) prob -= 0.15; // -15% (antes -10%)
+            // Escenarios 
+            if (escenario.equals("Asgard")) prob += 0.1; 
+            if (escenario.equals("Niflheim")) prob -= 0.15; 
             
-            return Math.max(0.1, Math.min(0.8, prob)); // Máximo 80% (antes 90%)
+            return Math.max(0.1, Math.min(0.8, prob)); 
         }
         
         public String getEstado() {
@@ -86,17 +85,18 @@ public class TestFinalConsola {
         System.out.println("\n ESTADO FINAL:");
         System.out.println(juego.getEstado());
         
-        System.out.println("========================================");
-        System.out.println("✅ PRUEBAS COMPLETADAS - SOLO CONSOLA ✅");
-        System.out.println("========================================");
+     
+        System.out.println(" PRUEBAS COMPLETADAS - SOLO CONSOLA ");
+    
         
         // Mostrar las probabilidades actuales
-        System.out.println("\n🎯 PROBABILIDADES ACTUALES:");
-        System.out.println("   Base: 30%");
-        System.out.println("   Espada vs Dragon: 50%");
-        System.out.println("   Hacha vs Gigante: 40%");
-        System.out.println("   Arco vs Serpiente: 45%");
-        System.out.println("   Asgard: +10% bonus");
-        System.out.println("   Niflheim: -15% penalización");
+        System.out.println("\n PROBABILIDADES ACTUALES:");
+        System.out.println("Base: 30%");
+        System.out.println("Espada vs Dragon: 50%");
+        System.out.println("Hacha vs Gigante: 40%");
+        System.out.println("Arco vs Serpiente: 45%");
+        System.out.println("Asgard: +10% bonus");
+        System.out.println("Niflheim: -15% penalización");
     }
+
 }
