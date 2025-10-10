@@ -1,111 +1,154 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package umariana.cupi2.torneonordico.mundo;
 
+import java.util.ArrayList;
 import java.util.Random;
 
-/**
- *
- * @author 70GA
- */
 public class TorneoNordico {
 
-    private int puntos;
-    private int victorias;
-    private int derrotas;
+    // Estructuras contenedoras de tamaño fijo 
+    private final String[] ARMAS = {"Espada", "Hacha", "Arco"};
+    private final int[] DANIO_ARMAS = {8, 10, 6};
+    private final int[] PRECISION_ARMAS = {85, 75, 95};
+    private final int[] VELOCIDAD_ARMAS = {7, 5, 8};
+
+    private final String[] CRIATURAS = {"Dragón", "Gigante", "Serpiente", "Troll", "Lobo"};
+    private final int[] VIDA_CRIATURAS = {30, 25, 20, 35, 15};
+
+    // Estructuras contenedoras de tamaño variable 
+    private ArrayList<String> hordaCriaturas;
+    private ArrayList<String> historialArmas;
+
+    // Atributos del juego
+    private String armaSeleccionada;
+    private int indiceArmaSeleccionada;
+    private int criaturaActual;
+    private int vidaJugador;
+    private boolean juegoActivo;
+
     private Random random;
 
     public TorneoNordico() {
-        this.puntos = 100; // Puntos iniciales
-        this.victorias = 0;
-        this.derrotas = 0;
-        this.random = new Random();
+        random = new Random();
+        hordaCriaturas = new ArrayList<>();
+        historialArmas = new ArrayList<>();
+        vidaJugador = 50;
+        juegoActivo = false;
+        criaturaActual = 0;
     }
 
-    // Ejecutar enfrentamiento
-    public String ejecutarEnfrentamiento(String arma, String escenario, String criatura) {
-        StringBuilder resultado = new StringBuilder();
-        resultado.append("⚔️ RESULTADO DEL ENFRENTAMIENTO ⚔️\n\n");
-        resultado.append("🗡️ Arma seleccionada: ").append(arma).append("\n");
-        resultado.append("🏰 Escenario: ").append(escenario).append("\n");
-        resultado.append("🐉 Criatura: ").append(criatura).append("\n\n");
-        resultado.append("--------------------------------\n\n");
+    // Sistema de Arsenal de Armas
+    public String[] getArmas() {
+        return ARMAS;
+    }
 
-        // Lógica del enfrentamiento
-        boolean victoria = calcularVictoria(arma, escenario, criatura);
+    public int getDanioArma(int indice) {
+        return DANIO_ARMAS[indice];
+    }
 
-        if (victoria) {
-            victorias++;
-            puntos += 30;
-            resultado.append("¡POR ODÍN! HAS VENCIDO 🏆\n");
-            resultado.append("¡Has vencido a ").append(criatura).append("!\n");
-            resultado.append("+30 puntos de gloria\n");
+    public int getPrecisionArma(int indice) {
+        return PRECISION_ARMAS[indice];
+    }
+
+    public int getVelocidadArma(int indice) {
+        return VELOCIDAD_ARMAS[indice];
+    }
+
+    public void seleccionarArma(int indice) {
+        if (indice >= 0 && indice < ARMAS.length) {
+            armaSeleccionada = ARMAS[indice];
+            indiceArmaSeleccionada = indice;
+            historialArmas.add(armaSeleccionada);
+        }
+    }
+
+    public String getArmaSeleccionada() {
+        return armaSeleccionada;
+    }
+
+    public boolean armaSeleccionada() {
+        return armaSeleccionada != null;
+    }
+
+    //Horda de Criaturas
+    public void generarHorda() {
+        hordaCriaturas.clear();
+        criaturaActual = 0;
+        juegoActivo = true;
+
+        //Instrucciones repetitivas para generar horda 
+        for (int i = 0; i < 3; i++) {
+            int indiceCriatura = random.nextInt(CRIATURAS.length);
+            hordaCriaturas.add(CRIATURAS[indiceCriatura]);
+        }
+    }
+
+    public ArrayList<String> getHordaCriaturas() {
+        return hordaCriaturas;
+    }
+
+    public String getCriaturaActual() {
+        if (criaturaActual < hordaCriaturas.size()) {
+            return hordaCriaturas.get(criaturaActual);
+        }
+        return null;
+    }
+
+    public int getProgresoHorda() {
+        return criaturaActual;
+    }
+
+    public int getTotalCriaturas() {
+        return hordaCriaturas.size();
+    }
+
+    public boolean enfrentarCriatura() {
+        if (!juegoActivo || criaturaActual >= hordaCriaturas.size()) {
+            return false;
+        }
+
+        // Simular enfrentamiento
+        int danioBase = getDanioArma(indiceArmaSeleccionada);
+        int precision = getPrecisionArma(indiceArmaSeleccionada);
+
+        // Verificar si el ataque es exitoso
+        if (random.nextInt(100) < precision) {
+            // Ataque exitoso
+            criaturaActual++;
+
+            // Verificar si se completó la horda
+            if (criaturaActual >= hordaCriaturas.size()) {
+                juegoActivo = false;
+            }
+            return true;
         } else {
-            derrotas++;
-            puntos = Math.max(0, puntos - 25);
-            resultado.append("El Ragnarok te alcanzó 💀\n");
-            resultado.append("Derrota contra ").append(criatura).append("\n");
-            resultado.append("-40 puntos\n");
+            // Ataque fallido - el jugador recibe daño
+            vidaJugador -= 10;
+            if (vidaJugador <= 0) {
+                juegoActivo = false;
+            }
+            return false;
         }
-
-        resultado.append("\nPuntos actuales: ").append(puntos);
-        return resultado.toString();
     }
 
-    //Obtener puntos
-    public String obtenerPuntos() {
-        return "🏆 SISTEMA DE PUNTOS 🏆\n\n"
-                + "• Puntos actuales: " + puntos + "\n"
-                + "• Victorias: " + victorias + "\n"
-                + "• Derrotas: " + derrotas + "\n\n"
-                + "¡Sigue luchando para aumentar tu gloria!";
+    public int getVidaJugador() {
+        return vidaJugador;
     }
 
-    //Calcular victoria 
-    private boolean calcularVictoria(String arma, String escenario, String criatura) {
-        // Espada vence a Dragón, etc.
-
-        double probabilidad = 0.3;
-
-        // Ventajas por combinaciones específicas
-        if (arma.equals("Espada") && criatura.equals("Dragon")) {
-            probabilidad = 0.5;
-        } else if (arma.equals("Hacha") && criatura.equals("Gigante")) {
-            probabilidad = 0.4;
-        } else if (arma.equals("Arco") && criatura.equals("Serpiente")) {
-            probabilidad = 0.45;
-        }
-
-        // Ventaja por escenario
-        if (escenario.equals("Asgard")) {
-            probabilidad += 0.1;
-        } else if (escenario.equals("Niflheim")) {
-            probabilidad -= 0.15;
-        }
-
-        // Asegurar que la probabilidad esté entre 0.1 y 0.8
-        probabilidad = Math.max(0.1, Math.min(0.8, probabilidad));
-
-        boolean gano = random.nextDouble() < probabilidad;
-
-        // Resultado aleatorio basado en la probabilidad
-        return random.nextDouble() < probabilidad;
+    public boolean isJuegoActivo() {
+        return juegoActivo;
     }
 
-    // Métodos para obtener estadísticas (opcionales)
-    public int getPuntos() {
-        return puntos;
+    public boolean isHordaCompletada() {
+        return criaturaActual >= hordaCriaturas.size() && hordaCriaturas.size() > 0;
     }
 
-    public int getVictorias() {
-        return victorias;
+    public void reiniciarJuego() {
+        vidaJugador = 50;
+        juegoActivo = false;
+        criaturaActual = 0;
+        armaSeleccionada = null;
+        indiceArmaSeleccionada = -1;
+        hordaCriaturas.clear();
+        historialArmas.clear();
     }
-
-    public int getDerrotas() {
-        return derrotas;
-
-    }
-
 }
