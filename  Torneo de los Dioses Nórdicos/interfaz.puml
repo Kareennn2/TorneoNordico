@@ -1,0 +1,127 @@
+@startuml
+!define MAIN_FRAME #E3F2FD
+!define PANEL #FCE4EC
+!define COMPONENT #E1F5FE
+
+title Diagrama de Clases - Interfaz Torneo Nórdico\n**Arquitectura MVC**
+
+skinparam class {
+    BackgroundColor White
+    BorderColor #666666
+    ArrowColor #333333
+    FontName Arial
+}
+
+package "Paquete umariana.cupi2.torneonordico.interfaz" {
+    
+    class InterfazTorneoNordico << (J,MAIN_FRAME) >> {
+        __Componentes Principales__
+        - torneo: TorneoNordico
+        - panelArma: PanelArma
+        - panelHorda: PanelHorda
+        - panelEscenario: PanelEscenario
+        - panelHistorial: PanelHistorial
+        - panelEstadisticas: PanelEstadisticas
+        - panelInventario: PanelInventario
+        __Métodos__
+        + InterfazTorneoNordico()
+        - inicializarComponentes(): void
+        - reiniciarJuego(): void
+    }
+    
+    class PanelArma << (P,PANEL) >> {
+        __Componentes Swing__
+        - comboArmas: JComboBox<String>
+        - lblDanio: JLabel
+        - lblPrecision: JLabel
+        - lblSinergia: JLabel
+        - btnSeleccionar: JButton
+        __Funcionalidad__
+        + habilitarSeleccion(): void
+        - actualizarEstadisticas(): void
+    }
+    
+    class PanelHorda << (P,PANEL) >> {
+        __Componentes Swing__
+        - btnGenerarHorda: JButton
+        - btnEnfrentar: JButton
+        - areaHorda: JTextArea
+        - lblProgreso: JLabel
+        __Funcionalidad__
+        - generarHorda(): void
+        - enfrentarCriatura(): void
+        - actualizarEstado(): void
+    }
+    
+    class PanelEscenario << (P,PANEL) >> {
+        __Componentes Swing__
+        - lblEscenario: JLabel
+        - lblVisibilidad: JLabel
+        - lblSinergiaActiva: JLabel
+        - areaDescripcion: JTextArea
+        __Funcionalidad__
+        + actualizarEscenario(): void
+    }
+    
+    class PanelHistorial << (P,PANEL) >> {
+        __Componentes Swing__
+        - areaHistorial: JTextArea
+        - lblEstadisticas: JLabel
+        - btnActualizar: JButton
+        __Funcionalidad__
+        + actualizarHistorial(): void
+    }
+    
+    class PanelEstadisticas << (P,PANEL) >> {
+        __Componentes Swing__
+        - lblVictoriasTotales: JLabel
+        - lblPorcentajeVictorias: JLabel
+        - areaLogros: JTextArea
+        __Funcionalidad__
+        + actualizarEstadisticas(): void
+    }
+    
+    class PanelInventario << (P,PANEL) >> {
+        __Componentes Swing__
+        - botonesInventario: JButton[5]
+        - comboObjetos: JComboBox<String>
+        - lblEspacio: JLabel
+        __Funcionalidad__
+        + actualizarInventario(): void
+    }
+}
+
+package "Modelo" {
+    class TorneoNordico << (M,#E3F2FD) >> {
+        (Clase del Mundo)
+    }
+}
+
+' ==== RELACIONES DE COMPOSICIÓN ====
+InterfazTorneoNordico "1" *-- "1" TorneoNordico : - torneo
+InterfazTorneoNordico "1" *-- "1" PanelArma : - panelArma
+InterfazTorneoNordico "1" *-- "1" PanelHorda : - panelHorda
+InterfazTorneoNordico "1" *-- "1" PanelEscenario : - panelEscenario
+InterfazTorneoNordico "1" *-- "1" PanelHistorial : - panelHistorial
+InterfazTorneoNordico "1" *-- "1" PanelEstadisticas : - panelEstadisticas
+InterfazTorneoNordico "1" *-- "1" PanelInventario : - panelInventario
+
+' ==== RELACIONES DE DEPENDENCIA ====
+PanelArma .> TorneoNordico : usa
+PanelHorda .> TorneoNordico : usa
+PanelEscenario .> TorneoNordico : usa
+PanelHistorial .> TorneoNordico : usa
+PanelEstadisticas .> TorneoNordico : usa
+PanelInventario .> TorneoNordico : usa
+
+PanelHorda .> PanelEscenario : actualiza
+PanelHorda .> PanelHistorial : actualiza
+
+note top of InterfazTorneoNordico
+  **Arquitectura MVC:**
+  • Modelo: TorneoNordico
+  • Vista: Paneles JPanel
+  • Controlador: InterfazTorneoNordico
+end note
+
+@enduml

@@ -10,6 +10,7 @@ public class PanelArma extends javax.swing.JPanel {
 
     private TorneoNordico torneo;
     private JComboBox<String> comboArmas;
+    private JLabel lblSinergia;
     private JLabel lblDanio;
     private JLabel lblPrecision;
     private JLabel lblVelocidad;
@@ -58,10 +59,24 @@ public class PanelArma extends javax.swing.JPanel {
         panelSuperior.add(lblTitulo);
         panelSuperior.add(comboArmas);
 
+        //SINERGIAS
+        JPanel panelSinergia = new JPanel(new FlowLayout());
+        panelSinergia.setBackground(COLOR_AZUL_OSCURO);
+
+        lblSinergia = new JLabel("Sinergia: -");
+        lblSinergia.setForeground(COLOR_ORO);
+        lblSinergia.setFont(new Font("Arial", Font.BOLD, 11));
+
+        panelSinergia.add(lblSinergia);
+
         // Panel central para estadísticas
         JPanel panelCentral = new JPanel(new GridLayout(3, 2, 5, 5));
         panelCentral.setBackground(COLOR_AZUL_OSCURO);
         panelCentral.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        JPanel panelCentralCompleto = new JPanel(new BorderLayout());
+        panelCentralCompleto.add(panelCentral, BorderLayout.CENTER);
+        panelCentralCompleto.add(panelSinergia, BorderLayout.SOUTH);
 
         agregarEtiquetaEstadistica(panelCentral, "Daño:", "");
         lblDanio = crearEtiquetaValor();
@@ -93,7 +108,7 @@ public class PanelArma extends javax.swing.JPanel {
 
         // Agregar componentes al panel principal
         add(panelSuperior, BorderLayout.NORTH);
-        add(panelCentral, BorderLayout.CENTER);
+        add(panelCentralCompleto, BorderLayout.CENTER);
         add(panelInferior, BorderLayout.SOUTH);
 
         // Actualizar estadísticas iniciales
@@ -136,20 +151,12 @@ public class PanelArma extends javax.swing.JPanel {
             lblDanio.setText(torneo.getDanioArma(indice) + " puntos");
             lblPrecision.setText(torneo.getPrecisionArma(indice) + "%");
             lblVelocidad.setText(torneo.getVelocidadArma(indice) + "/10");
+
+            actualizarInfoSinergia(indice);
+
         }
     }
 
-    private void seleccionarArma() {
-        int indice = comboArmas.getSelectedIndex();
-        torneo.seleccionarArma(indice);
-
-        lblMensaje.setForeground(COLOR_ORO);
-        lblMensaje.setText("¡" + torneo.getArmaSeleccionada() + " seleccionada!");
-
-        // Deshabilitar selección una vez elegida
-        comboArmas.setEnabled(false);
-        btnSeleccionar.setEnabled(false);
-    }
 
     public boolean isArmaSeleccionada() {
         return torneo.armaSeleccionada();
@@ -162,6 +169,51 @@ public class PanelArma extends javax.swing.JPanel {
         comboArmas.setSelectedIndex(0); // Resetear selección
         actualizarEstadisticas(); // Actualizar stats
     }
+    
+        /**
+     * Actualiza la información de sinergias del arma seleccionada
+     * @param indiceArma Índice del arma seleccionada
+     */
+    private void actualizarInfoSinergia(int indiceArma) {
+        String[] escenarios = {"Bosque Nórdico", "Montaña Helada", "Pantano Oscuro"};
+        String arma = torneo.getArmas()[indiceArma];
+        String sinergia = "";
+        
+        // Determinar sinergia según el arma
+        switch (arma) {
+            case "Espada":
+                sinergia = "Montaña Helada (+5 daño)";
+                break;
+            case "Hacha":
+                sinergia = "Pantano Oscuro (+5 daño)";
+                break;
+            case "Arco":
+                sinergia = "Bosque Nórdico (+5 daño)";
+                break;
+        }
+        
+        lblSinergia.setText("Sinergia: " + sinergia);
+    }
+
+    private void seleccionarArma() {
+        int indice = comboArmas.getSelectedIndex();
+        torneo.seleccionarArma(indice);
+
+        String mensaje = "¡" + torneo.getArmaSeleccionada() + " seleccionada!";
+        
+        // AGREGAR INFORMACIÓN DE SINERGIA AL MENSAJE
+        if (torneo.getEscenarioActual() != null && torneo.tieneSinergiaArmaEscenario()) {
+            mensaje += " ⚡ Sinergia con " + torneo.getEscenarioActual() + "!";
+        }
+        
+        lblMensaje.setForeground(COLOR_ORO);
+        lblMensaje.setText(mensaje);
+
+        // Deshabilitar selección una vez elegida
+        comboArmas.setEnabled(false);
+        btnSeleccionar.setEnabled(false);
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

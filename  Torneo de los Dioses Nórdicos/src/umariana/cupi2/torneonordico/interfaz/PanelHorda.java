@@ -16,6 +16,8 @@ public class PanelHorda extends javax.swing.JPanel {
     private JLabel lblVidaJugador;
     private JLabel lblMensaje;
     private JTextArea areaHorda;
+    private PanelEscenario panelEscenario;
+    private PanelHistorial panelHistorial;
 
     // Colores 
     private final Color COLOR_ORO = new Color(212, 175, 55);
@@ -25,9 +27,11 @@ public class PanelHorda extends javax.swing.JPanel {
     private final Color COLOR_VERDE = new Color(50, 150, 50);
     private final Color COLOR_ROJO = new Color(200, 50, 50);
 
-    public PanelHorda(TorneoNordico torneo) {
+    public PanelHorda(TorneoNordico torneo, PanelEscenario panelEscenario, PanelHistorial panelHistorial) {
         initComponents();
         this.torneo = torneo;
+        this.panelEscenario = panelEscenario;
+        this.panelHistorial = panelHistorial;
         setLayout(new BorderLayout());
         setBackground(COLOR_AZUL_FONDO);
         setBorder(BorderFactory.createTitledBorder(
@@ -142,7 +146,15 @@ public class PanelHorda extends javax.swing.JPanel {
 
         torneo.generarHorda();
         actualizarEstado();
-        mostrarMensaje("¡Horda generada! Enfrenta a las criaturas", COLOR_VERDE);
+
+        // Verificar que panelEscenario no es null antes de usarlo
+        if (panelEscenario != null) {
+            panelEscenario.actualizarEscenario();
+            mostrarMensaje("¡Horda generada en " + torneo.getEscenarioActual() + "!", COLOR_VERDE);
+        } else {
+            // Si aún así es null, mostrar mensaje sin escenario
+            mostrarMensaje("¡Horda generada! Escenario: " + torneo.getEscenarioActual(), COLOR_VERDE);
+        }
     }
 
     private void enfrentarCriatura() {
@@ -160,6 +172,7 @@ public class PanelHorda extends javax.swing.JPanel {
         }
 
         actualizarEstado();
+        panelHistorial.actualizarHistorial();
 
         // Verificar fin del juego
         if (!torneo.isJuegoActivo()) {
@@ -168,6 +181,7 @@ public class PanelHorda extends javax.swing.JPanel {
             } else if (torneo.getVidaJugador() <= 0) {
                 mostrarMensaje("GAME OVER - Te has quedado sin vida", COLOR_ROJO);
             }
+            panelHistorial.actualizarHistorial();
         }
     }
 
@@ -177,15 +191,40 @@ public class PanelHorda extends javax.swing.JPanel {
             StringBuilder sb = new StringBuilder();
             java.util.List<String> horda = torneo.getHordaCriaturas();
 
-            // Usando instrucciones repetitivas para mostrar horda (nivel 3)
+            // mostrar horda 
             for (int i = 0; i < horda.size(); i++) {
+                String criatura = horda.get(i);
                 String estado = (i < torneo.getProgresoHorda()) ? "[VENCIDO] " : "[PENDIENTE] ";
-                sb.append(estado).append(horda.get(i)).append("\n");
+                String armaRecomendada = torneo.getArmaRecomendada(criatura);
+                boolean armaEfectiva = torneo.esArmaEfectiva(criatura);
+
+                if (armaEfectiva && i >= torneo.getProgresoHorda()) {
+                    sb.append(estado).append("⚡ ").append(criatura)
+                            .append(" - Débil a: ").append(armaRecomendada).append(" ⚡\n");
+                } else {
+                    sb.append(estado).append(criatura)
+                            .append(" - Débil a: ").append(armaRecomendada).append("\n");
+                    sb.append(estado).append(horda.get(i)).append("\n");
+                }
+
             }
             areaHorda.setText(sb.toString());
 
-            lblCriaturaActual.setText("Criatura actual: "
-                    + (torneo.getCriaturaActual() != null ? torneo.getCriaturaActual() : "Horda completada"));
+            String criaturaActual = torneo.getCriaturaActual();
+            if (criaturaActual != null) {
+                String armaRecomendada = torneo.getArmaRecomendada(criaturaActual);
+                boolean armaEfectiva = torneo.esArmaEfectiva(criaturaActual);
+
+                String textoCriatura = "Criatura actual: " + criaturaActual;
+                if (armaEfectiva) {
+                    textoCriatura += " ⚡ (Débil a tu arma!)";
+                } else {
+                    textoCriatura += " - Recomendado: " + armaRecomendada;
+                }
+                lblCriaturaActual.setText(textoCriatura);
+            } else {
+                lblCriaturaActual.setText("Horda completada");
+            }
         } else {
             areaHorda.setText("Aquí se mostrará la horda de criaturas...");
             lblCriaturaActual.setText("Horda no generada");
@@ -205,11 +244,15 @@ public class PanelHorda extends javax.swing.JPanel {
     }
 
     public void reiniciarPanel() {
-        actualizarEstado();
+        areaHorda.setText("Genera una horda para comenzar...");
+        lblCriaturaActual.setText("Horda no generada");
+        lblProgreso.setText("Progreso: 0/0");
+        lblVidaJugador.setText("Vida: 50");
         lblMensaje.setText("Selecciona un arma y genera una horda para comenzar");
         lblMensaje.setForeground(COLOR_GRIS_CLARO);
-        btnGenerarHorda.setEnabled(torneo.armaSeleccionada());
-        btnEnfrentar.setEnabled(false);
+
+        // Actualizar estado de botones
+        actualizarEstado();
     }
 
     public void actualizarDesdeExterno() {

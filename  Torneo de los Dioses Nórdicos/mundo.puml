@@ -1,0 +1,107 @@
+@startuml
+title Diagrama de Clases - Mundo Torneo Nórdico
+
+skinparam class {
+    BackgroundColor White
+    BorderColor #999999
+    FontColor Black
+}
+
+' ==== CLASES PRINCIPALES DEL MUNDO ====
+
+class TorneoNordico {
+    - ARMAS : String[]
+    - ESCENARIOS : String[]
+    - CRIATURAS : String[]
+    - SINERGIAS_ARMAS_ESCENARIOS : int[][]
+    - DEBILIDADES_CRIATURAS : Map<String, String>
+    - hordaCriaturas : ArrayList<String>
+    - historialArmas : ArrayList<String>
+    - inventario : String[]
+    - armaSeleccionada : String
+    - indiceArmaSeleccionada : int
+    - criaturaActual : int
+    - vidaJugador : int
+    - juegoActivo : boolean
+    - escenarioActual : String
+    - indiceEscenarioActual : int
+    - resultados : Resultados
+    - random : Random
+    --
+    + TorneoNordico()
+    + seleccionarArma(indice: int) : void
+    + generarHorda() : void
+    + enfrentarCriatura() : boolean
+    + generarEscenarioAleatorio() : void
+    + agregarAlInventario(objeto: String) : boolean
+    + usarObjeto(indice: int) : String
+    + reiniciarJuego() : void
+    + tieneSinergiaArmaEscenario() : boolean
+    + esArmaEfectiva(criatura: String) : boolean
+    + getArmaRecomendada(criatura: String) : String
+    + getBonusSinergia() : int
+    + getBonusDebilidad(criatura: String) : int
+}
+
+class Resultados {
+    - historialCombates : ArrayList<String>
+    - ultimos10Combates : String[]
+    - victorias : int
+    - derrotas : int
+    - victoriasTotales : int
+    - derrotasTotales : int
+    - logrosDesbloqueados : boolean[]
+    - contadorCombates : int
+    --
+    + Resultados()
+    + registrarCombate(arma: String, criatura: String, victoria: boolean) : void
+    + getUltimosCombates(cantidad: int) : ArrayList<String>
+    + getUltimos10Combates() : String[]
+    + getVictorias() : int
+    + getDerrotas() : int
+    + getVictoriasTotales() : int
+    + getDerrotasTotales() : int
+    + getPorcentajeVictorias() : double
+    + getLogros() : String[]
+    + getLogrosDesbloqueados() : boolean[]
+    + reiniciarEstadisticas() : void
+    + verificarLogros() : void
+}
+
+' ==== ESTRUCTURAS DE DATOS (Nivel 3) ====
+
+class "ArrayList<String>" as ArrayListString {
+    + add(element: String) : boolean
+    + get(index: int) : String
+    + size() : int
+    + clear() : void
+}
+
+class "String[]" as StringArray {
+    + length : int
+}
+
+class "int[][]" as IntMatrix {
+    + [row][col] : int
+}
+
+class "Map<String,String>" as MapStringString {
+    + get(key: String) : String
+    + put(key: String, value: String) : String
+    + containsKey(key: String) : boolean
+}
+
+' ==== RELACIONES ====
+
+TorneoNordico "1" --> "1" Resultados : - resultados
+TorneoNordico "1" --> "1" ArrayListString : - hordaCriaturas
+TorneoNordico "1" --> "1" ArrayListString : - historialArmas
+TorneoNordico "1" --> "1" StringArray : - inventario
+TorneoNordico "1" --> "1" IntMatrix : - SINERGIAS_ARMAS_ESCENARIOS
+TorneoNordico "1" --> "1" MapStringString : - DEBILIDADES_CRIATURAS
+
+Resultados "1" --> "1" ArrayListString : - historialCombates
+Resultados "1" --> "1" StringArray : - ultimos10Combates
+Resultados "1" --> "1" "boolean[]" : - logrosDesbloqueados
+
+@enduml

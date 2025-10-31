@@ -9,6 +9,10 @@ public class InterfazTorneoNordico extends javax.swing.JFrame {
     private TorneoNordico torneo;
     private PanelArma panelArma;
     private PanelHorda panelHorda;
+    private PanelEscenario panelEscenario;
+    private PanelHistorial panelHistorial;
+    private PanelInventario panelInventario;
+    private PanelEstadisticas panelEstadisticas;
     private JButton btnReiniciar;
 
     // Colores 
@@ -25,9 +29,9 @@ public class InterfazTorneoNordico extends javax.swing.JFrame {
     private void inicializarVentana() {
         setTitle("Torneo Nórdico - CUPI2 Nivel 3");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
+        setSize(800, 800);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
         getContentPane().setBackground(COLOR_AZUL_FONDO);
         setLayout(new BorderLayout());
     }
@@ -42,16 +46,24 @@ public class InterfazTorneoNordico extends javax.swing.JFrame {
         panelTitulo.add(lblTitulo);
 
         // Panel central con los dos paneles principales
-        JPanel panelCentral = new JPanel(new GridLayout(1, 2, 10, 10));
+        JPanel panelCentral = new JPanel(new GridLayout(3, 2, 10, 10));
         panelCentral.setBackground(COLOR_AZUL_FONDO);
         panelCentral.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Crear los paneles
         panelArma = new PanelArma(torneo);
-        panelHorda = new PanelHorda(torneo);
+        panelEscenario = new PanelEscenario(torneo);
+        panelHistorial = new PanelHistorial(torneo);
+        panelHorda = new PanelHorda(torneo, panelEscenario, panelHistorial);
+        panelInventario = new PanelInventario(torneo);
+        panelEstadisticas = new PanelEstadisticas(torneo);
 
         panelCentral.add(panelArma);
+        panelCentral.add(panelEscenario);
         panelCentral.add(panelHorda);
+        panelCentral.add(panelHistorial);
+        panelCentral.add(panelInventario);
+        panelCentral.add(panelEstadisticas);
 
         // Panel inferior con botón reiniciar
         JPanel panelInferior = new JPanel();
@@ -74,7 +86,11 @@ public class InterfazTorneoNordico extends javax.swing.JFrame {
     private void reiniciarJuego() {
         torneo.reiniciarJuego();
         panelArma.habilitarSeleccion();
+        panelEscenario.reiniciarPanel();
         panelHorda.reiniciarPanel();
+        panelHistorial.reiniciarPanel();
+        panelInventario.reiniciarPanel();
+        panelEstadisticas.reiniciarPanel();
         JOptionPane.showMessageDialog(this, "Juego reiniciado. ¡Buena suerte, guerrero!");
     }
 
