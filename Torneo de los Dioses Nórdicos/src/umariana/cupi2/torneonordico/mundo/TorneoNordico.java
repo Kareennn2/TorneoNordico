@@ -198,19 +198,25 @@ public class TorneoNordico {
 
         boolean ataqueExitoso = random.nextInt(100) < precisionFinal;
 
-        if (ataqueExitoso) {
-            // REGISTRAR INFORMACIÓN DE SINERGIAS/DEBILIDADES EN EL COMBATE
-            String detallesExtra = "";
-            if (bonusSinergia > 0) {
-                detallesExtra += " (+" + bonusSinergia + " sinergia)";
-            }
-            if (bonusDebilidad > 0) {
-                detallesExtra += " (+" + bonusDebilidad + " debilidad)";
-            }
-            // COMBATE EXITOSO - derrotar criatura actual
-
-            resultados.registrarCombate(armaSeleccionada, criaturaActualNombre, true);
-            criaturaActual++;
+if (ataqueExitoso) {
+    // AGREGAR INFORMACIÓN DE SINERGIAS/DEBILIDADES AL REGISTRO
+    String detallesExtra = "";
+    
+    // Verificar y agregar sinergia
+    if (tieneSinergiaArmaEscenario()) {
+        detallesExtra += " (+" + getBonusSinergia() + " sinergia)";
+    }
+    
+    // Verificar y agregar debilidad
+    if (esArmaEfectiva(criaturaActualNombre)) {
+        detallesExtra += " (+" + getBonusDebilidad(criaturaActualNombre) + " debilidad)";
+    }
+    
+    // Registrar con detalles extras
+    String armaConDetalles = armaSeleccionada + detallesExtra;
+    resultados.registrarCombate(armaConDetalles, criaturaActualNombre, true);
+    
+    criaturaActual++;
 
             // Verificar si se completó la horda
             if (criaturaActual >= hordaCriaturas.size()) {
@@ -423,3 +429,4 @@ public class TorneoNordico {
         this.random = random;
     }
 }
+
